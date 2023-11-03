@@ -9,14 +9,13 @@ All env vars are mandatory, but build-dir can be omitted if building
 from root. Make sure that your keys are provided via secrets,
 not plain vars.
 
+- role-to-assume: Required assume role arn
 - build-dir: Optional folder name to the dockerfile to build
 - VERSION: Must be the version to release as
 - SENTRY_PROJECT: Sentry project slug
 - AWS_REPOSITORY: The slug of the aws repository
 - AWS_ACCOUNT: The Account ID
 - AWS_REGION: AWS Region
-- AWS_ACCESS_KEY_ID: Key ID used to push docker image
-- AWS_SECRET_ACCESS_KEY: Secret key used to push docker image
 
 ## Outputs
 
@@ -33,8 +32,9 @@ This action has the below outputs:
 
 ```yaml
   - name: Build docker image for admin
-    uses: pixelfusion/actions/build@v1
+    uses: academyEX/actions/build@master
     with:
+      role-to-assume: 'arn:aws:iam::503467447491:role/academyex-dev-iam-gh-baseghwebsitecd8C5935B6-4JS99IPOV7V7'
       build-dir: 'admin'
     env:
       VERSION: ${{ needs.release.outputs.version }}
