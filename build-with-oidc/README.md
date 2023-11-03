@@ -34,7 +34,7 @@ This action has the below outputs:
   - name: Build docker image for admin
     uses: academyEX/actions/build@master
     with:
-      role-to-assume: 'arn:aws:iam::503467447491:role/academyex-dev-iam-gh-baseghwebsitecd8C5935B6-4JS99IPOV7V7'
+      role-to-assume: 'arn:aws:iam::503467447491:role/academyex-dev-iam-gh-baseghwebsitecd8C5935B6-4JS99IPOV767'
       build-dir: 'admin'
     env:
       VERSION: ${{ needs.release.outputs.version }}
