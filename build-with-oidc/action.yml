@@ -48,13 +48,13 @@ runs:
     - name: Logout of Amazon ECR
       shell: bash
       run: docker logout ${{ steps.login-ecr-pf.outputs.registry }}
-    - name: Notify Slack
-      uses: justinr636/github-action-slack-notify-build@v1
-      if: failure()
-      with:
-        channel: ${{ env.SLACK_CHANNEL }}
-        status: Failed to release
-        color: '#dd0000'
+#    - name: Notify Slack
+#      uses: justinr636/github-action-slack-notify-build@v1
+#      if: failure()
+#      with:
+#        channel: ${{ env.SLACK_CHANNEL }}
+#        status: Failed to release
+#        color: '#dd0000'
     - id: result
       name: Set outputs
       shell: bash
