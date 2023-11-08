@@ -31,7 +31,7 @@ runs:
     - name: Build & Push
       shell: bash
       env:
-        DOCKER_IMAGE: ${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_REPOSITORY }}
+        DOCKER_IMAGE: '${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_REPOSITORY }}'
         SENTRY_RELEASE: ${{ env.SENTRY_PROJECT }}@${{ env.VERSION }}
       working-directory: ${{ inputs.build-dir }}
       run: |
