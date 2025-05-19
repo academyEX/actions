@@ -38,11 +38,12 @@ runs:
     - name: Build & Push
       shell: bash
       env:
+        NEED_VERSION_FILE: ${{ inputs.version-file }}
         DOCKER_IMAGE: '${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_REPOSITORY }}'
         SENTRY_RELEASE: ${{ env.SENTRY_PROJECT }}@${{ env.VERSION }}
       working-directory: ${{ inputs.build-dir }}
       run: |
-        if [ "$VERSION_FILE" == "true" ]; then
+        if [ "$NEED_VERSION_FILE" == "true" ]; then
           echo "$VERSION" > ./public/version.txt
         fi
         docker build -t $DOCKER_IMAGE:${{ env.VERSION }} .
