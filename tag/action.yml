@@ -8,7 +8,7 @@ inputs:
   node_version:
     description: 'Node version to setup. Can set to blank string to disable node setup'
     required: false
-    default: '24'
+    default: '22'
 outputs:
   version:
     description: "Tag of released version"
@@ -29,10 +29,10 @@ runs:
       # Note: Remove the alias line once https://github.com/semantic-release/github/pull/487 is merged
       run: |-
         npm install -g \
-          semantic-release \
-          @semantic-release/exec \
-          @semantic-release/git \
-          semantic-release-major-tag
+          semantic-release@24.2.7 \
+          @semantic-release/exec@6 \
+          @semantic-release/git@10 \
+          semantic-release-major-tag@1
     - name: Release
       shell: bash
       # Note: semantic-release can partially fail, but still tag (that's important)
