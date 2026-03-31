@@ -8,7 +8,7 @@ inputs:
   node_version:
     description: 'Node version to setup. Can set to blank string to disable node setup'
     required: false
-    default: '20'
+    default: '24'
 outputs:
   version:
     description: "Tag of released version"
@@ -20,7 +20,7 @@ runs:
       uses: actions/checkout@v4
       if: ${{ inputs.checkout == 'true' }}
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       if: ${{ inputs.node_version != '' }}
       with:
         node-version: ${{ inputs.node_version }}
