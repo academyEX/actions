@@ -1,0 +1,81 @@
+name: Slack Notify
+description: Send a release / deploy notification to a Slack incoming webhook
+inputs:
+  webhook:
+    description: 'Slack incoming webhook URL (store as a secret)'
+    required: true
+  status:
+    description: "Result to report: 'success' or 'failure'"
+    required: true
+  environment:
+    description: 'Environment label shown in the message, e.g. UAT or PROD'
+    required: false
+    default: ''
+  version:
+    description: 'Release version / tag'
+    required: false
+    default: ''
+  url:
+    description: 'Service URL to include in the message'
+    required: false
+    default: ''
+  context:
+    description: 'Optional extra mrkdwn line, e.g. which stage failed'
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - name: Send Slack notification
+      shell: bash
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.webhook }}
+        STATUS: ${{ inputs.status }}
+        ENVIRONMENT: ${{ inputs.environment }}
+        VERSION: ${{ inputs.version }}
+        SERVICE_URL: ${{ inputs.url }}
+        EXTRA_CONTEXT: ${{ inputs.context }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        ACTOR: ${{ github.actor }}
+      run: |
+        set -euo pipefail
+
+        if [ -z "${SLACK_WEBHOOK_URL}" ]; then
+          echo "::error::slack-notify: 'webhook' input is empty" >&2
+          exit 1
+        fi
+
+        if [ "${STATUS}" = "success" ]; then
+          EMOJI="✅"; VERB="deploy succeeded"
+        else
+          EMOJI="❌"; VERB="release failed"
+        fi
+        HEADER="${EMOJI} ${ENVIRONMENT:+${ENVIRONMENT} }${VERB}"
+        FALLBACK="${HEADER}${VERSION:+ (${VERSION})}"
+
+        # Build the Block Kit payload with jq so values are JSON-escaped safely.
+        PAYLOAD=$(jq -n \
+          --arg header "$HEADER" \
+          --arg fallback "$FALLBACK" \
+          --arg version "$VERSION" \
+          --arg env "$ENVIRONMENT" \
+          --arg url "$SERVICE_URL" \
+          --arg ctx "$EXTRA_CONTEXT" \
+          --arg run "$RUN_URL" \
+          --arg actor "$ACTOR" \
+          '
+          def field(lbl; val): if val != "" then [{type:"mrkdwn", text:("*"+lbl+":*\n"+val)}] else [] end;
+          {
+            text: $fallback,
+            blocks: (
+              [ {type:"header", text:{type:"plain_text", text:$header, emoji:true}} ]
+              + ( ( field("Version"; (if $version != "" then "`"+$version+"`" else "" end))
+                    + field("Environment"; $env) ) as $f
+                  | if ($f|length) > 0 then [{type:"section", fields:$f}] else [] end )
+              + (if $url != "" then [{type:"section", text:{type:"mrkdwn", text:("*URL:*\n<"+$url+"|"+$url+">")}}] else [] end)
+              + (if $ctx != "" then [{type:"section", text:{type:"mrkdwn", text:$ctx}}] else [] end)
+              + [ {type:"context", elements:[{type:"mrkdwn", text:("<"+$run+"|View workflow run> · "+$actor)}]} ]
+            )
+          }')
+
+        curl -sSf -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
