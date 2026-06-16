@@ -13,3 +13,7 @@ The below actions can be used in your project:
 
 - [pixelfusion/actions/composer-diff](./composer-diff) - Describe changes to composer.lock
 - [pixelfusion/actions/package-diff](./package-diff) - Describe changes to package-lock.json
+
+## Notification scripts:
+
+- [pixelfusion/actions/slack-notify](./slack-notify) - Send a release / deploy notification to Slack
