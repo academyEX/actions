@@ -13,7 +13,9 @@ pass branch names, versions, etc. without manual quoting).
 - `webhook` (required) - Slack incoming webhook URL. Store it as a secret.
 - `status` (required) - `success` or `failure`. Anything other than
   `success` is treated as a failure.
-- `environment` - Label shown in the message, e.g. `UAT` or `PROD`.
+- `project` - Project name shown in the header, e.g. `Akomai LMS`. Combined
+  with `environment` as `Project (ENV)`, e.g. `✅ Akomai LMS (UAT) deploy succeeded`.
+- `environment` - Label shown in the header, e.g. `UAT` or `PROD`.
 - `version` - Release version / tag.
 - `url` - Service URL to include in the message.
 - `context` - Optional extra mrkdwn line, e.g. which stage failed.
@@ -44,6 +46,7 @@ deploy pipeline:
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: success
+          project: Akomai LMS
           environment: UAT
           version: ${{ needs.release-build.outputs.version }}
           url: https://app.uat.academyex.com
@@ -53,6 +56,7 @@ deploy pipeline:
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: failure
+          project: Akomai LMS
           environment: UAT
           version: ${{ needs.release-build.outputs.version }}
           context: >-
