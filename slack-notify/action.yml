@@ -7,8 +7,12 @@ inputs:
   status:
     description: "Result to report: 'success' or 'failure'"
     required: true
+  project:
+    description: 'Project name shown in the header, e.g. Akomai LMS'
+    required: false
+    default: ''
   environment:
-    description: 'Environment label shown in the message, e.g. UAT or PROD'
+    description: 'Environment label shown in the header, e.g. UAT or PROD'
     required: false
     default: ''
   version:
@@ -31,6 +35,7 @@ runs:
       env:
         SLACK_WEBHOOK_URL: ${{ inputs.webhook }}
         STATUS: ${{ inputs.status }}
+        PROJECT: ${{ inputs.project }}
         ENVIRONMENT: ${{ inputs.environment }}
         VERSION: ${{ inputs.version }}
         SERVICE_URL: ${{ inputs.url }}
@@ -50,7 +55,13 @@ runs:
         else
           EMOJI="❌"; VERB="release failed"
         fi
-        HEADER="${EMOJI} ${ENVIRONMENT:+${ENVIRONMENT} }${VERB}"
+        # Header prefix: "Project (ENV)", or whichever of the two is provided.
+        if [ -n "${PROJECT}" ] && [ -n "${ENVIRONMENT}" ]; then
+          PREFIX="${PROJECT} (${ENVIRONMENT})"
+        else
+          PREFIX="${PROJECT}${ENVIRONMENT}"
+        fi
+        HEADER="${EMOJI} ${PREFIX:+${PREFIX} }${VERB}"
         FALLBACK="${HEADER}${VERSION:+ (${VERSION})}"
 
         # Build the Block Kit payload with jq so values are JSON-escaped safely.
